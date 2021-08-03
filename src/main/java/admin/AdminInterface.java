@@ -4,29 +4,18 @@ public interface AdminInterface extends java.rmi.Remote
 {
     /**
      * Method to register first time users to the service
-     * @param username
-     * @return message informing the user if it has been successfully registered or notifies of error if any
+     * @param entity containing the info about the new user
+     * @return BrokerInfoPayload informing the user about one of the active broker
      * @throws InterruptedException
      */
-    String registerNewUser(String username) throws java.rmi.RemoteException, InterruptedException;
+    BrokerInfoPayload registerNewUser(AbstractNetworkEntity entity) throws java.rmi.RemoteException, InterruptedException;
 
     /**
      * Method to register first time brokers to the service
      * @param serverIp
      * @param portNumber
-     * @return message informing the broker if it has been successfully registered or notifies of error if any
+     * @return boolean check informing the broker if it has been successfully registered or notifies of error if any
      */
-    String registerNewBroker(String serverIp, int portNumber) throws java.rmi.RemoteException, InterruptedException;
+    boolean registerNewBroker(String serverIp, int portNumber) throws java.rmi.RemoteException, InterruptedException;
 
-    /**
-     * Sends a given message to all the available brokers connected with the AdminServer
-     * @param message
-     */
-    void notifyAllBrokers(String message) throws java.rmi.RemoteException, InterruptedException;
-
-    /**
-     * Deletes the inactive broker from its records
-     * @param brokerID
-     */
-    void deleteInactiveBroker(String brokerID) throws java.rmi.RemoteException, InterruptedException;
 }
