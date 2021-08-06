@@ -7,7 +7,11 @@ import java.io.Serializable;
  */
 public class BrokerInfoPayload extends AbstractNetworkEntity implements Serializable {
 
-  public BrokerInfoPayload(String entityID, String HOST, String PORT, boolean isActive) {
+  public BrokerInfoPayload(String entityID, String HOST, int PORT, boolean isActive) {
     super(entityID, HOST, PORT, isActive);
+  }
+
+  public BrokerInfoPayload(String entityID, int PORT, boolean isActive) {
+    super(entityID, "localhost", PORT, isActive);
   }
 }

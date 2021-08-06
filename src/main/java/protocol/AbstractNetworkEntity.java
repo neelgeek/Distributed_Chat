@@ -4,10 +4,10 @@ public abstract class AbstractNetworkEntity {
 
   private String entityID;
   private String HOST;
-  private String PORT;
+  private int PORT;
   private boolean isActive;
 
-  public AbstractNetworkEntity(String entityID, String HOST, String PORT, boolean isActive) {
+  public AbstractNetworkEntity(String entityID, String HOST, int PORT, boolean isActive) {
     this.entityID = entityID;
     this.HOST = HOST;
     this.PORT = PORT;
@@ -27,7 +27,7 @@ public abstract class AbstractNetworkEntity {
     return HOST;
   }
 
-  public String getPORT() {
+  public int getPORT() {
     return PORT;
   }
 
