@@ -1,5 +1,8 @@
 package admin;
 
+import protocol.BrokerInfoPayload;
+import protocol.UserInfoPayload;
+
 public interface AdminInterface extends java.rmi.Remote
 {
     /**
