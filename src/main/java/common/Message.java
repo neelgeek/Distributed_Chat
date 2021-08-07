@@ -6,14 +6,24 @@ import java.io.Serializable;
  * interface representing messages passed from one node to the other
  * as a parameter
  */
-public interface Message extends Serializable {
-    String getSenderRMIName();
+public class Message implements Serializable {
+    public String getSenderRMIName() {
+        return null;
+    }
 
-    String getSenderUsername();
+    public String getSenderUsername() {
+        return null;
+    }
 
-    String getSubject();
+    public String getSubject() {
+        return null;
+    }
 
-    String getTimeStamp();
+    public String getTimeStamp() {
+        return null;
+    }
 
-    String getMessage();
+    public String getMessage() {
+        return null;
+    }
 }
