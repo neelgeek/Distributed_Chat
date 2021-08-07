@@ -16,6 +16,7 @@ public class RMIAdminImpl implements Admin {
   Map<String, Long> brokerTimeouts = new HashMap<>();
 
   public RMIAdminImpl() {
+
   }
 
   @Override
@@ -37,6 +38,11 @@ public class RMIAdminImpl implements Admin {
     return false;
   }
 
+  @Override
+  public void sendBrokerHeartbeat(BrokerInfoPayload brokerInfo) throws RemoteException {
+
+  }
+
   /**
    * Announces the info about the newly joined broker to currently active brokers;
    *
@@ -47,8 +53,7 @@ public class RMIAdminImpl implements Admin {
     for (BrokerInfoPayload broker : this.brokerRecord.values()) {
       try {
         registry = LocateRegistry.getRegistry(broker.getHOST(), broker.getPORT());
-        Broker<BrokerInfoPayload> brokerStub = (Broker<BrokerInfoPayload>) registry.lookup(
-            "Broker");
+        Broker brokerStub = (Broker) registry.lookup("Broker");
         brokerStub.sendBrokerUpdate(newBroker);
       } catch (RemoteException | NotBoundException e) {
         e.printStackTrace();
