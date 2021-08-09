@@ -12,13 +12,14 @@ import java.rmi.registry.Registry;
 public class StartBroker {
 
   public static void main(String[] args) {
+
     Registry registry;
     String ADMIN_HOST = args[0];
     Integer ADMIN_PORT = Integer.valueOf(args[1]);
     Integer PORT = Integer.valueOf(args[2]);
 
-    Broker broker = new BrokerImpl(ADMIN_HOST, ADMIN_PORT);
     try {
+      Broker broker = new BrokerImpl(ADMIN_HOST, ADMIN_PORT, PORT);
       registry = LocateRegistry.createRegistry(PORT);
       registry.bind("Broker", broker);
     } catch (RemoteException e) {
