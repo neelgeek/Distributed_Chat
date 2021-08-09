@@ -1,7 +1,8 @@
 package admin;
 
 import common.OutputHandler;
-import java.rmi.AlreadyBoundException;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -16,11 +17,12 @@ public class StartAdmin {
       registry = LocateRegistry.createRegistry(PORT);
 
       Admin admin = new RMIAdminImpl();
-      registry.bind("Admin", admin);
-      OutputHandler.printWithTimestamp(String.format("Start admin on PORT: %d", PORT));
+      registry.rebind("Admin", admin);
+      OutputHandler.printWithTimestamp(String.format("Start admin on HOST: %s PORT: %d",
+          Inet4Address.getLocalHost().getHostAddress(), PORT));
     } catch (RemoteException e) {
       e.printStackTrace();
-    } catch (AlreadyBoundException e) {
+    } catch (UnknownHostException e) {
       e.printStackTrace();
     }
   }
