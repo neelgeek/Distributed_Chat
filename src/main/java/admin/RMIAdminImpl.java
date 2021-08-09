@@ -81,12 +81,14 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, StatusMa
   private void announceNewBroker(BrokerInfoPayload newBroker) {
     Registry registry;
     for (BrokerInfoPayload broker : this.brokerRecord.values()) {
-      try {
-        registry = LocateRegistry.getRegistry(broker.getHOST(), broker.getPORT());
-        Broker brokerStub = (Broker) registry.lookup("Broker");
-        brokerStub.sendBrokerUpdate(newBroker);
-      } catch (RemoteException | NotBoundException e) {
-        e.printStackTrace();
+      if (broker.isActive()) {
+        try {
+          registry = LocateRegistry.getRegistry(broker.getHOST(), broker.getPORT());
+          Broker brokerStub = (Broker) registry.lookup("Broker");
+          brokerStub.sendBrokerUpdate(newBroker);
+        } catch (RemoteException | NotBoundException e) {
+          this.setClientInactive(broker.getEntityID());
+        }
       }
     }
   }
@@ -102,7 +104,13 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, StatusMa
       e.printStackTrace();
     }
     // Update the last heartbeat time to current timestamp
-    this.brokerTimeouts.put(clientInfo.getEntityID(), System.currentTimeMillis());
+    if (this.brokerRecord.containsKey(clientInfo.getEntityID())) {
+      this.brokerTimeouts.put(clientInfo.getEntityID(), System.currentTimeMillis());
+    } else {
+      OutputHandler.printWithTimestamp(
+          String.format("Heartbeat Received from Unregistered Broker at: %s",
+              clientInfo.getHOST()));
+    }
   }
 
   @Override
