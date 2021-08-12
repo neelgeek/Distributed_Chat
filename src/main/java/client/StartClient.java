@@ -15,20 +15,18 @@ public class StartClient {
      */
     public static void main(String args[]) throws RemoteException, InterruptedException {
         // change later to make the name unique
-        String rmiName = "client";
-        String adminName = "admin";
+        String rmiName = "Client";
+        String adminName = "Admin";
 
         String username = args[0];
-        Integer PORT = Integer.valueOf(args[1]);
+        String adminHost = args[1];
+        Integer adminPORT = Integer.valueOf(args[2]);
+        Integer brokerPort = Integer.valueOf(args[3]);
         String successMessage = "Client " + rmiName + " successfully registered";
-        Client client = new Client(rmiName, username);
+        Client client = new Client(username, adminHost, adminPORT);
 
-        try {
-            RMIHandler.registerRemoteObject(rmiName, client, PORT, successMessage);
-            client.discoverBroker(adminName, null, null);
-        } catch (RemoteException | InterruptedException e) {
-            OutputHandler.printWithTimestamp("Error: broker discovery failed");
-            e.printStackTrace();
-        }
+        client.discoverBroker();
+        client.startSendingHearbeat();
+
     }
 }

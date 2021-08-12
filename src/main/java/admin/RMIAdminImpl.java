@@ -36,6 +36,10 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, StatusMa
   }
 
 
+  // Why does this always return NULL?
+  // Who is supposed to call this method, client or broker?
+  // If the client calls it, then RemoteServer.getClientHost will return
+  // the host name of the client, when we want the host name of the broker
   @Override
   public BrokerInfoPayload registerNewUser(UserInfoPayload user)
       throws RemoteException, InterruptedException {
