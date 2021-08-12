@@ -1,11 +1,16 @@
 package protocol;
 
-public abstract class AbstractNetworkEntity {
+import java.io.Serializable;
+
+public abstract class AbstractNetworkEntity implements Serializable {
 
   private String entityID;
   private String HOST;
   private int PORT;
   private boolean isActive;
+
+  protected AbstractNetworkEntity() {
+  }
 
   public AbstractNetworkEntity(String entityID, String HOST, int PORT, boolean isActive) {
     this.entityID = entityID;
@@ -37,5 +42,9 @@ public abstract class AbstractNetworkEntity {
 
   public void setActive(boolean active) {
     isActive = active;
+  }
+
+  public void setHOST(String HOST) {
+    this.HOST = HOST;
   }
 }

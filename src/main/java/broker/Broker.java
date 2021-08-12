@@ -19,12 +19,11 @@ public interface Broker extends Remote {
   void sendBrokerUpdate(BrokerInfoPayload brokerInfo) throws RemoteException;
 
   /**
-   * Informs the broker that the given client is still active. Method call works as a heartbeat and
-   * should be called by the client every second.
+   * Registers a User into the Broker's user record
    *
-   * @param clientInfo Payload containing the user client info
+   * @param userInfoPayload payload containing the user's information
+   * @return True if user is successfully registered, else False
    * @throws RemoteException
    */
-  void sendClientHeartbeat(UserInfoPayload clientInfo) throws RemoteException;
-
+  boolean registerUser(UserInfoPayload userInfoPayload) throws RemoteException;
 }
