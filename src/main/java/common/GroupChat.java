@@ -11,4 +11,11 @@ public interface GroupChat {
    * @return
    */
   ArrayList<UserInfoPayload> getGroupParticipants();
+
+//  /**
+//   * Returns the ID for the group chat
+//   *
+//   * @return
+//   */
+//  String getGroupChatID();
 }

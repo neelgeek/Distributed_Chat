@@ -46,6 +46,16 @@ public interface Broker extends Remote {
   List<GroupChat> getGroupChats() throws RemoteException;
 
   /**
+   * Creates a new Group chat with the given name set to the group name
+   *
+   * @param groupName The name to be set for the new Group
+   * @param creator
+   * @return
+   * @throws RemoteException
+   */
+  GroupChat createGroupChat(String groupName, UserInfoPayload creator) throws RemoteException;
+
+  /**
    * Adds a new user to a group chat
    *
    * @param userInfo  User that wants to join the group chat

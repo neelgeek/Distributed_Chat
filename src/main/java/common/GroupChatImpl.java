@@ -1,17 +1,28 @@
 package common;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import protocol.UserInfoPayload;
 
 public class GroupChatImpl implements GroupChat {
 
-  private String chatID;
-  private Map<String, UserInfoPayload> participants;
+  private String groupID = UUID.randomUUID().toString();
+  private String groupName;
+  private Map<String, UserInfoPayload> participants = new HashMap<>();
 
   @Override
   public ArrayList<UserInfoPayload> getGroupParticipants() {
     return new ArrayList<>(participants.values());
+  }
+
+  public GroupChatImpl(String groupName) {
+    this.groupName = groupName;
+  }
+
+  public String getGroupID() {
+    return groupID;
   }
 
   /**
