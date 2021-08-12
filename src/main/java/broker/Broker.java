@@ -58,10 +58,22 @@ public interface Broker extends Remote {
   /**
    * Adds a new user to a group chat
    *
-   * @param userInfo  User that wants to join the group chat
-   * @param groupChat Group chat info
-   * @return
+   * @param joiningUser User that wants to join the group chat
+   * @param groupChat   Group chat info
+   * @return Returns the {@link GroupChat} object with the user in its participants. Returns Null if
+   * the group does not exist
    * @throws RemoteException
    */
-  boolean joinGroupChat(UserInfoPayload userInfo, GroupChat groupChat) throws RemoteException;
+  GroupChat joinGroupChat(UserInfoPayload joiningUser, GroupChat groupChat) throws RemoteException;
+
+  /**
+   * Removes the user from the group if they are a participant of that group.
+   *
+   * @param leavingUser User that has to be removed from the group
+   * @param groupChat   Group from which the user wants to leave
+   * @return True if the user has left successfully, else False
+   */
+  boolean leaveGroupChat(UserInfoPayload leavingUser, GroupChat groupChat);
+
+
 }

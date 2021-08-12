@@ -123,14 +123,25 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
   }
 
   @Override
-  public boolean joinGroupChat(UserInfoPayload userInfo, GroupChat groupChat)
+  public GroupChat joinGroupChat(UserInfoPayload joiningUser, GroupChat groupChat)
       throws RemoteException {
 
     GroupChatImpl gc = (GroupChatImpl) groupChat;
     if (this.groupChatsRecord.containsKey(gc.getGroupID())) {
       GroupChatImpl existingGroup = (GroupChatImpl) this.groupChatsRecord.get(gc.getGroupID());
-      existingGroup.addParticipant(userInfo);
+      existingGroup.addParticipant(joiningUser);
       //TODO: Add announcement logic
+      return existingGroup;
+    }
+    return null;
+  }
+
+  @Override
+  public boolean leaveGroupChat(UserInfoPayload leavingUser, GroupChat groupChat) {
+    GroupChatImpl gc = (GroupChatImpl) groupChat;
+    if (groupChatsRecord.containsKey(gc.getGroupID())) {
+      GroupChatImpl existingGroup = (GroupChatImpl) groupChatsRecord.get(gc.getGroupID());
+      existingGroup.removeParticipant(leavingUser);
       return true;
     }
     return false;
