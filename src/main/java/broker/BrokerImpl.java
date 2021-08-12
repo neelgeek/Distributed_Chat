@@ -2,6 +2,7 @@ package broker;
 
 import admin.Admin;
 import common.ClientStatusChecker;
+import common.GroupChat;
 import common.HeartbeatReceiver;
 import common.OutputHandler;
 import common.PingHeartbeat;
@@ -14,6 +15,7 @@ import java.rmi.server.RemoteServer;
 import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -91,6 +93,22 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
       this.userTimeouts.put(userInfoPayload.getEntityID(), System.currentTimeMillis());
       return true;
     }
+    return false;
+  }
+
+  @Override
+  public List<UserInfoPayload> getActiveUsers() throws RemoteException {
+    return null;
+  }
+
+  @Override
+  public List<GroupChat> getGroupChats() throws RemoteException {
+    return null;
+  }
+
+  @Override
+  public boolean joinGroupChat(UserInfoPayload userInfo, GroupChat groupChat)
+      throws RemoteException {
     return false;
   }
 
