@@ -25,7 +25,7 @@ public class StartClient {
 
         try {
             RMIHandler.registerRemoteObject(rmiName, client, PORT, successMessage);
-            client.discoverBroker(adminName, null);
+            client.discoverBroker(adminName, null, null);
         } catch (RemoteException | InterruptedException e) {
             OutputHandler.printWithTimestamp("Error: broker discovery failed");
             e.printStackTrace();

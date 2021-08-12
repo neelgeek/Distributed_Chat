@@ -10,7 +10,7 @@ public class UserInfoPayload extends AbstractNetworkEntity implements Serializab
   private String userName;
 
 
-  public UserInfoPayload(String userID, String userName, String HOST, String PORT,
+  public UserInfoPayload(String userID, String userName, String HOST, Integer PORT,
       boolean isActive) {
     super(userID, HOST, PORT, isActive);
     this.userName = userName;

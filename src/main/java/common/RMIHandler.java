@@ -42,16 +42,17 @@ public class RMIHandler{
      * @param <T> generic type of object
      * @return object with the given RMI name
      */
-    public static <T> T fetchRemoteObject(String RMIname, String host) {
+    public static <T> T fetchRemoteObject(String RMIname, String host, Integer PORT) {
 
         String errorMessage = "Error: could not find remote object";
 
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
+        if (PORT == null) {
+            PORT = 1099;
         }
+
         try {
             String name = RMIname;
-            Registry registry = LocateRegistry.getRegistry(host);
+            Registry registry = LocateRegistry.getRegistry(host, PORT);
             T obj = (T) registry.lookup(name);
 
             return obj;

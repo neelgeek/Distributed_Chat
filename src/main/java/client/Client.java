@@ -1,6 +1,6 @@
 package client;
 
-import admin.AdminInterface;
+import admin.Admin;
 import common.OutputHandler;
 import common.RMIHandler;
 import protocol.BrokerInfoPayload;
@@ -30,11 +30,16 @@ public class Client implements ClientToBrokerInterface {
      * @throws RemoteException
      * @throws InterruptedException
      */
-    public void discoverBroker(String adminName, String host) throws RemoteException, InterruptedException {
+    public void discoverBroker(String adminName, String host, Integer PORT) throws RemoteException, InterruptedException {
+
+        if (PORT == null) {
+            PORT = 1099;
+        }
 
         try {
-            AdminInterface admin = RMIHandler.fetchRemoteObject(adminName, host);
+            Admin admin = RMIHandler.fetchRemoteObject(adminName, host, PORT);
             UserInfoPayload uip = new UserInfoPayload(rmiName, username, true);
+            assert admin != null;
             bip = admin.registerNewUser(uip);
         } catch (NullPointerException e) {
             OutputHandler.printWithTimestamp("Error: admin object is null");
