@@ -8,7 +8,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class StartAdmin {
-
+  /*
+    Takes only 1 CMD Argument, i.e. the port on which the admin rmi will run.
+   */
   public static void main(String[] args) {
     Registry registry;
     Integer PORT = Integer.valueOf(args[0]);

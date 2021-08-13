@@ -11,6 +11,14 @@ import java.rmi.registry.Registry;
  */
 public class StartBroker {
 
+  /*
+    Takes 3 CMD Arguments -
+    1. HOST address of admin - pass 127.0.0.1 for local
+    2. PORT of admin
+    3. PORT on which this broker will run. Use unique PORT numbers for each broker.
+    Use $Prompt$ if you want Intellij to pop up an input box for this argument each time you
+    run the broker.
+   */
   public static void main(String[] args) {
 
     Registry registry;
