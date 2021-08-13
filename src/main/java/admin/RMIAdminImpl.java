@@ -12,8 +12,10 @@ import java.rmi.registry.Registry;
 import java.rmi.server.RemoteServer;
 import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -52,6 +54,11 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, StatusMa
       e.printStackTrace();
     }
 
+    if (this.brokerRecord.values().size() > 0) {
+      ArrayList<BrokerInfoPayload> activeBrokers = (ArrayList<BrokerInfoPayload>) this.brokerRecord.values();
+      return activeBrokers.get(new Random().nextInt(activeBrokers.size()));
+    }
+    // Return null if there are no active brokers
     return null;
   }
 
