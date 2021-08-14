@@ -12,8 +12,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.RemoteServer;
 import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +35,10 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, StatusMa
   }
 
 
+  // Why does this always return NULL?
+  // Who is supposed to call this method, client or broker?
+  // If the client calls it, then RemoteServer.getClientHost will return
+  // the host name of the client, when we want the host name of the broker
   @Override
   public BrokerInfoPayload registerNewUser(UserInfoPayload user)
       throws RemoteException, InterruptedException {
@@ -48,6 +51,11 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, StatusMa
       e.printStackTrace();
     }
 
+    if (this.brokerRecord.values().size() > 0) {
+      List<BrokerInfoPayload> activeBrokers = new ArrayList<BrokerInfoPayload>(this.brokerRecord.values());
+      return activeBrokers.get(new Random().nextInt(activeBrokers.size()));
+    }
+    // Return null if there are no active brokers
     return null;
   }
 
