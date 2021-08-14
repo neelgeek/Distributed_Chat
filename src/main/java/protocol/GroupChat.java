@@ -1,9 +1,9 @@
-package common;
+package protocol;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import protocol.UserInfoPayload;
 
-public interface GroupChat {
+public interface GroupChat extends Serializable {
 
   /**
    * Returns the List of active participants in the group

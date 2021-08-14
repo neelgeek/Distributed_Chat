@@ -1,10 +1,10 @@
 package broker;
 
-import common.GroupChat;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 import protocol.BrokerInfoPayload;
+import protocol.GroupChat;
 import protocol.UserInfoPayload;
 
 /**
@@ -73,7 +73,7 @@ public interface Broker extends Remote {
    * @param groupChat   Group from which the user wants to leave
    * @return True if the user has left successfully, else False
    */
-  boolean leaveGroupChat(UserInfoPayload leavingUser, GroupChat groupChat);
+  boolean leaveGroupChat(UserInfoPayload leavingUser, GroupChat groupChat) throws RemoteException;
 
 
 }

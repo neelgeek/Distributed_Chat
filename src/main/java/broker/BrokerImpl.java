@@ -2,8 +2,8 @@ package broker;
 
 import admin.Admin;
 import common.ClientStatusChecker;
-import common.GroupChat;
-import common.GroupChatImpl;
+import protocol.GroupChat;
+import protocol.GroupChatInfoPayload;
 import common.HeartbeatReceiver;
 import common.OutputHandler;
 import common.PingHeartbeat;
@@ -116,7 +116,7 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
   @Override
   public GroupChat createGroupChat(String groupName, UserInfoPayload creator)
       throws RemoteException {
-    GroupChatImpl newChat = new GroupChatImpl(groupName);
+    GroupChatInfoPayload newChat = new GroupChatInfoPayload(groupName);
     newChat.addParticipant(creator);
     this.groupChatsRecord.put(newChat.getGroupID(), newChat);
     return newChat;
@@ -126,9 +126,9 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
   public GroupChat joinGroupChat(UserInfoPayload joiningUser, GroupChat groupChat)
       throws RemoteException {
 
-    GroupChatImpl gc = (GroupChatImpl) groupChat;
+    GroupChatInfoPayload gc = (GroupChatInfoPayload) groupChat;
     if (this.groupChatsRecord.containsKey(gc.getGroupID())) {
-      GroupChatImpl existingGroup = (GroupChatImpl) this.groupChatsRecord.get(gc.getGroupID());
+      GroupChatInfoPayload existingGroup = (GroupChatInfoPayload) this.groupChatsRecord.get(gc.getGroupID());
       existingGroup.addParticipant(joiningUser);
       //TODO: Add announcement logic
       return existingGroup;
@@ -137,10 +137,11 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
   }
 
   @Override
-  public boolean leaveGroupChat(UserInfoPayload leavingUser, GroupChat groupChat) {
-    GroupChatImpl gc = (GroupChatImpl) groupChat;
+  public boolean leaveGroupChat(UserInfoPayload leavingUser, GroupChat groupChat)
+      throws RemoteException {
+    GroupChatInfoPayload gc = (GroupChatInfoPayload) groupChat;
     if (groupChatsRecord.containsKey(gc.getGroupID())) {
-      GroupChatImpl existingGroup = (GroupChatImpl) groupChatsRecord.get(gc.getGroupID());
+      GroupChatInfoPayload existingGroup = (GroupChatInfoPayload) groupChatsRecord.get(gc.getGroupID());
       existingGroup.removeParticipant(leavingUser);
       return true;
     }
