@@ -19,6 +19,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import protocol.BrokerInfoPayload;
+import protocol.GroupChat;
+import protocol.GroupChatInfoPayload;
 import protocol.UserInfoPayload;
 
 public class BrokerImpl extends UnicastRemoteObject implements Broker,
@@ -117,10 +119,12 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
   @Override
   public void setClientInactive(String clientID) {
     UserInfoPayload userInfo = this.userRecord.get(clientID);
-    userInfo.setActive(false);
-    OutputHandler.printWithTimestamp(
-        String.format("User with ID: %s HOST: %s timed out. Setting status to inActive.",
-            clientID, userInfo.getHOST()));
+    if (userInfo.isActive()) {
+      userInfo.setActive(false);
+      OutputHandler.printWithTimestamp(
+          String.format("User with ID: %s HOST: %s timed out. Setting status to inActive.",
+              clientID, userInfo.getHOST()));
+    }
   }
 }
 
