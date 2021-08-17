@@ -2,6 +2,8 @@ package broker;
 
 import admin.Admin;
 import common.ClientStatusChecker;
+import protocol.GroupChat;
+import protocol.GroupChatInfoPayload;
 import common.HeartbeatReceiver;
 import common.OutputHandler;
 import common.PingHeartbeat;
@@ -13,11 +15,14 @@ import java.rmi.registry.Registry;
 import java.rmi.server.RemoteServer;
 import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import protocol.BrokerInfoPayload;
 import protocol.GroupChat;
 import protocol.GroupChatInfoPayload;
@@ -29,6 +34,7 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
   private HashMap<String, BrokerInfoPayload> peerBrokers = new HashMap<>();
   private HashMap<String, UserInfoPayload> userRecord = new HashMap<>();
   private HashMap<String, Long> userTimeouts = new HashMap<>();
+  private HashMap<String, GroupChat> groupChatsRecord = new HashMap<>();
 
   private Admin adminServer;
   private Registry registry;
@@ -91,6 +97,54 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
 //      this.announceNewBroker(broker);
       this.userRecord.put(userInfoPayload.getEntityID(), userInfoPayload);
       this.userTimeouts.put(userInfoPayload.getEntityID(), System.currentTimeMillis());
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public List<UserInfoPayload> getActiveUsers() throws RemoteException {
+    ArrayList<UserInfoPayload> activeUsers = this.userRecord.values().stream()
+        .filter(user -> user.isActive()).collect(
+            Collectors.toCollection(ArrayList::new));
+    return activeUsers;
+  }
+
+  @Override
+  public List<GroupChat> getGroupChats() throws RemoteException {
+    return (List<GroupChat>) this.groupChatsRecord.values();
+  }
+
+  @Override
+  public GroupChat createGroupChat(String groupName, UserInfoPayload creator)
+      throws RemoteException {
+    GroupChatInfoPayload newChat = new GroupChatInfoPayload(groupName);
+    newChat.addParticipant(creator);
+    this.groupChatsRecord.put(newChat.getGroupID(), newChat);
+    return newChat;
+  }
+
+  @Override
+  public GroupChat joinGroupChat(UserInfoPayload joiningUser, GroupChat groupChat)
+      throws RemoteException {
+
+    GroupChatInfoPayload gc = (GroupChatInfoPayload) groupChat;
+    if (this.groupChatsRecord.containsKey(gc.getGroupID())) {
+      GroupChatInfoPayload existingGroup = (GroupChatInfoPayload) this.groupChatsRecord.get(gc.getGroupID());
+      existingGroup.addParticipant(joiningUser);
+      //TODO: Add announcement logic
+      return existingGroup;
+    }
+    return null;
+  }
+
+  @Override
+  public boolean leaveGroupChat(UserInfoPayload leavingUser, GroupChat groupChat)
+      throws RemoteException {
+    GroupChatInfoPayload gc = (GroupChatInfoPayload) groupChat;
+    if (groupChatsRecord.containsKey(gc.getGroupID())) {
+      GroupChatInfoPayload existingGroup = (GroupChatInfoPayload) groupChatsRecord.get(gc.getGroupID());
+      existingGroup.removeParticipant(leavingUser);
       return true;
     }
     return false;

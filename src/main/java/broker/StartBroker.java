@@ -5,6 +5,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.UUID;
 
 /**
  * Starts new Brokers

@@ -2,7 +2,9 @@ package broker;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 import protocol.BrokerInfoPayload;
+import protocol.GroupChat;
 import protocol.UserInfoPayload;
 
 /**
@@ -26,4 +28,52 @@ public interface Broker extends Remote {
    * @throws RemoteException
    */
   boolean registerUser(UserInfoPayload userInfoPayload) throws RemoteException;
+
+  /**
+   * Fetches the list of active users in the system.
+   *
+   * @return List of {@link UserInfoPayload}, each representing an active user.
+   * @throws RemoteException
+   */
+  List<UserInfoPayload> getActiveUsers() throws RemoteException;
+
+  /**
+   * Fetched the list of all group chats in the system.
+   *
+   * @return
+   * @throws RemoteException
+   */
+  List<GroupChat> getGroupChats() throws RemoteException;
+
+  /**
+   * Creates a new Group chat with the given name set to the group name
+   *
+   * @param groupName The name to be set for the new Group
+   * @param creator
+   * @return
+   * @throws RemoteException
+   */
+  GroupChat createGroupChat(String groupName, UserInfoPayload creator) throws RemoteException;
+
+  /**
+   * Adds a new user to a group chat
+   *
+   * @param joiningUser User that wants to join the group chat
+   * @param groupChat   Group chat info
+   * @return Returns the {@link GroupChat} object with the user in its participants. Returns Null if
+   * the group does not exist
+   * @throws RemoteException
+   */
+  GroupChat joinGroupChat(UserInfoPayload joiningUser, GroupChat groupChat) throws RemoteException;
+
+  /**
+   * Removes the user from the group if they are a participant of that group.
+   *
+   * @param leavingUser User that has to be removed from the group
+   * @param groupChat   Group from which the user wants to leave
+   * @return True if the user has left successfully, else False
+   */
+  boolean leaveGroupChat(UserInfoPayload leavingUser, GroupChat groupChat) throws RemoteException;
+
+
 }
