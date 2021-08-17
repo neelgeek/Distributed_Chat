@@ -4,7 +4,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import protocol.AbstractNetworkEntity;
 
 /**
  * Calls the Heartbeat method in the admin, notifying it that this Broker is active.
@@ -37,10 +36,10 @@ public class PingHeartbeat<I> implements Runnable {
     try {
       this.serverStub.sendHeartBeat(selfInfo);
       OutputHandler.printWithTimestamp(
-          "Sent Broker heart beat to admin");
+          "Sent Broker heart beat to " + SERVER_STUB_NAME);
     } catch (RemoteException | NullPointerException e) {
       OutputHandler.printWithTimestamp(
-          "ERROR: Unable to connect to the admin for sending heartbeat");
+          "ERROR: Unable to connect to the " + SERVER_STUB_NAME + " for sending heartbeat");
     }
   }
 
