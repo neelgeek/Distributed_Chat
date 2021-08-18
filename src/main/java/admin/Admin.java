@@ -1,6 +1,7 @@
 package admin;
 
 import java.rmi.RemoteException;
+import java.util.List;
 import protocol.BrokerInfoPayload;
 import protocol.UserInfoPayload;
 
@@ -25,5 +26,11 @@ public interface Admin extends java.rmi.Remote {
   boolean registerNewBroker(BrokerInfoPayload broker)
       throws java.rmi.RemoteException, InterruptedException;
 
+  /**
+   * Returns a list of active brokers registered with the server
+   *
+   * @return
+   */
+  List<BrokerInfoPayload> getActiveBrokers() throws RemoteException;
 
 }

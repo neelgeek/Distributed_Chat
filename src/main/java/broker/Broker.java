@@ -12,6 +12,7 @@ import protocol.UserInfoPayload;
  */
 public interface Broker extends Remote {
 
+
   /**
    * Sends an update about another broker that has become active or inactive. This method is used by
    * the admin server to sends broker updates to active brokers.

@@ -75,7 +75,10 @@ public class Client implements ClientToBrokerInterface {
       assert admin != null;
       bip = admin.registerNewUser(uip);
       brokerStub = RMIHandler.fetchRemoteObject(brokerName, bip.getHOST(), bip.getPORT());
+      registerUser();
+      startSendingHearbeat();
     } catch (NullPointerException e) {
+      e.printStackTrace();
       OutputHandler.printWithTimestamp("Error: admin object is null");
     } catch (RemoteException | InterruptedException e) {
       e.printStackTrace();
