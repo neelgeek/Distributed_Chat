@@ -121,6 +121,9 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
         break;
       }
     }
+    if (peerBrokerStub == null) {
+      return;
+    }
     try {
       ArrayList<UserInfoPayload> activeUsers = (ArrayList<UserInfoPayload>) peerBrokerStub.getActiveUsers();
       for (UserInfoPayload user : activeUsers) {
@@ -247,6 +250,11 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
     UserInfoPayload userInfo = this.userRecord.get(clientID);
     if (userInfo.isActive()) {
       userInfo.setActive(false);
+      try {
+        adminProposer.submitRequest(userInfo);
+      } catch (RemoteException e) {
+        e.printStackTrace();
+      }
       OutputHandler.printWithTimestamp(
           String.format("User with ID: %s HOST: %s timed out. Setting status to inActive.",
               clientID, userInfo.getHOST()));
@@ -331,12 +339,21 @@ class AnnouncementProcessor extends BrokerImpl implements Runnable {
     for (Integer proposalID : this.announcementMap.keySet()) {
       Replicable requestPayload = this.announcementMap.get(proposalID);
       if (requestPayload instanceof UserInfoPayload) {
-        userRecord.put(((UserInfoPayload) requestPayload).getEntityID(),
-            (UserInfoPayload) requestPayload);
-        OutputHandler.printWithTimestamp(
-            String.format("User data replicated for new user with ID: %s at HOST: %s",
-                ((UserInfoPayload) requestPayload).getEntityID(),
-                ((UserInfoPayload) requestPayload).getHOST()));
+        if (((UserInfoPayload) requestPayload).isActive()) {
+          userRecord.put(((UserInfoPayload) requestPayload).getEntityID(),
+              (UserInfoPayload) requestPayload);
+          OutputHandler.printWithTimestamp(
+              String.format("User data added for new user with ID: %s at HOST: %s",
+                  ((UserInfoPayload) requestPayload).getEntityID(),
+                  ((UserInfoPayload) requestPayload).getHOST()));
+        } else {
+          userRecord.remove(((UserInfoPayload) requestPayload).getEntityID());
+          OutputHandler.printWithTimestamp(
+              String.format("User data deleted for user with ID: %s at HOST: %s",
+                  ((UserInfoPayload) requestPayload).getEntityID(),
+                  ((UserInfoPayload) requestPayload).getHOST()));
+        }
+
       }
       this.announcementMap.remove(proposalID);
     }
