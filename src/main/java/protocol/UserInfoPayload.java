@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class UserInfoPayload extends AbstractNetworkEntity implements Serializable {
 
   private String userName;
-  private String SOCKET_PORT;
+  private int SOCKET_PORT;
 
   public UserInfoPayload() {
   }
@@ -20,7 +20,7 @@ public class UserInfoPayload extends AbstractNetworkEntity implements Serializab
 //  }
 
   public UserInfoPayload(String entityID, String HOST, int PORT, boolean isActive,
-      String userName, String SOCKET_PORT) {
+      String userName, int SOCKET_PORT) {
     super(entityID, HOST, PORT, isActive);
     this.userName = userName;
     this.SOCKET_PORT = SOCKET_PORT;
@@ -35,7 +35,7 @@ public class UserInfoPayload extends AbstractNetworkEntity implements Serializab
     return userName;
   }
 
-  public String getSOCKET_PORT() {
+  public int getSOCKET_PORT() {
     return SOCKET_PORT;
   }
 }

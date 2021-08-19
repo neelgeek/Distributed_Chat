@@ -98,4 +98,8 @@ public class Client implements ClientToBrokerInterface {
 
   }
   // entid
+
+  public void sendMessageToPeer(UserInfoPayload peer) {
+
+  }
 }
