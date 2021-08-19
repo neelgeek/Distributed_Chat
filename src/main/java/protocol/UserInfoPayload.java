@@ -6,6 +6,9 @@ package protocol;
 public class UserInfoPayload extends AbstractNetworkEntity implements Replicable {
 
   private String userName;
+
+
+
   private int SOCKET_PORT;
 
   public UserInfoPayload() {
@@ -35,5 +38,9 @@ public class UserInfoPayload extends AbstractNetworkEntity implements Replicable
 
   public int getSOCKET_PORT() {
     return SOCKET_PORT;
+  }
+
+  public void setSOCKET_PORT(int SOCKET_PORT) {
+    this.SOCKET_PORT = SOCKET_PORT;
   }
 }

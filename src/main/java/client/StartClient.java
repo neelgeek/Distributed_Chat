@@ -1,6 +1,9 @@
 package client;
 
+import protocol.UserInfoPayload;
+
 import java.rmi.RemoteException;
+import java.util.List;
 
 public class StartClient {
 
@@ -21,11 +24,21 @@ public class StartClient {
     Integer adminPORT = Integer.valueOf(args[2]);
     Integer clientPort = Integer.valueOf(args[3]);
     //TODO: this is the port to be used for the socket
-    Integer clientSocketPort = Integer.valueOf(args[4]);
+    // Integer clientSocketPort = Integer.valueOf(args[4]);
 
     String successMessage = "Client successfully registered on PORT: " + clientPort;
     Client client = new Client(username, adminHost, adminPORT);
     client.discoverBroker();
     client.registerRMI(rmiName, clientPort, successMessage);
+
+    client.startPeerListener(0);
+    client.connectWithAllPeers();
+    client.startPeerReplier();
+
+    /*List<UserInfoPayload> users = client.getActiveUsers();
+    System.out.println("Active Users:");
+    for (UserInfoPayload uip : users) {
+      System.out.println(uip.getUserName());
+    }*/
   }
 }

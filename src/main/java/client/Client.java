@@ -2,22 +2,34 @@ package client;
 
 import admin.Admin;
 import broker.Broker;
+import client.ThreadingTCP.ClientToThreadInterface;
+import client.ThreadingTCP.PeerListener;
+import client.ThreadingTCP.PeerReplier;
 import common.OutputHandler;
 import common.PingHeartbeat;
 import common.RMIHandler;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 import protocol.BrokerInfoPayload;
 import protocol.UserInfoPayload;
 
 /**
  * class represents client
  */
-public class Client implements ClientToBrokerInterface {
+public class Client implements ClientToBrokerInterface, ClientToThreadInterface {
 
   private final String adminHost;
   private Integer adminPort;
@@ -26,8 +38,14 @@ public class Client implements ClientToBrokerInterface {
   private BrokerInfoPayload bip = null;
   private Broker brokerStub;
 
+  private List<PeerListener> listeners = new ArrayList<>();
+  private List<Socket> peerSockets = new ArrayList<>();
+  private PeerReplier replier;
+
   private UserInfoPayload selfRecord;
   private ScheduledExecutorService clientHeartbeatService = Executors.newSingleThreadScheduledExecutor();
+
+  private List<DataOutputStream> peerOutputStreams = new ArrayList<>();
 
   public Client(String username, String adminHost, Integer adminPort) {
     this.adminHost = adminHost;
@@ -106,4 +124,66 @@ public class Client implements ClientToBrokerInterface {
   public void sendMessageToPeer(UserInfoPayload peer) {
 
   }
+
+  @Override
+  public void startPeerListener(int portNo) {
+    PeerListener listener = new PeerListener(this, portNo);
+    listeners.add(listener);
+    listener.start();
+  }
+
+  //TODO: will not work with multiple peers unless user payload is a remote object
+  @Override
+  public void setListenerPort(int portNo) throws RemoteException {
+    selfRecord.setSOCKET_PORT(portNo);
+    brokerStub.setUserPortNumber(selfRecord.getEntityID(), portNo);
+  }
+
+  public void startPeerReplier() {
+    replier = new PeerReplier(this);
+    replier.start();
+  }
+
+  @Override
+  public List<DataOutputStream> getAllOutputStreams() {
+    return peerOutputStreams;
+  }
+
+  @Override
+  public void addPeerToOutputStream(DataOutputStream dos) {
+    peerOutputStreams.add(dos);
+  }
+
+  private List<UserInfoPayload> getActiveUsers() throws RemoteException {
+    return brokerStub.getActiveUsers();
+  }
+
+  // TODO: check to see if a client is already connected!
+  public void connectWithAllPeers() throws RemoteException {
+    List<UserInfoPayload> uips = brokerStub.getActiveUsers();
+
+    for (UserInfoPayload user : uips) {
+      if (user.getUserName().equals(this.selfRecord.getUserName())) {
+        continue;
+      }
+      String host = user.getHOST();
+      int portNo = user.getSOCKET_PORT();
+      try {
+        Socket s1 = new Socket(host, portNo);
+        peerSockets.add(s1);
+        OutputHandler.printWithTimestamp("Success: connected with" + user.getUserName() + " on " + portNo);
+        // s1.setSoTimeout(1000);
+        OutputStream s1out = s1.getOutputStream();
+        DataOutputStream dos = new DataOutputStream(s1out);
+        peerOutputStreams.add(dos);
+      } catch (UnknownHostException e) {
+        OutputHandler.printWithTimestamp("Error: could not identify host");
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+
 }

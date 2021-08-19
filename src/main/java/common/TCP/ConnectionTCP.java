@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class ConnectionTCP extends AbstractTCPNode {
 
-    public String startConnection(UserInfoPayload uip) {
+    public String startConnection(UserInfoPayload uip) throws IOException {
         String host = uip.getHOST();
         int portNo = uip.getSOCKET_PORT();
 
@@ -28,7 +28,7 @@ public class ConnectionTCP extends AbstractTCPNode {
                 Scanner in = new Scanner(System.in);
                 String response;
 
-                while (true) {
+                /*while (true) {
                     System.out.println("Please type a query in on of the following formats:");
                     System.out.println("PUT <string> <string>");
                     System.out.println("GET <string>");
@@ -47,7 +47,7 @@ public class ConnectionTCP extends AbstractTCPNode {
                     } catch (IOException e) {
                         throw new IOException("Error: could not read input stream");
                     }
-                }
+                }*/
 
                 /*System.out.println("Please type a message for the server");
                 String message = in.nextLine();
@@ -65,6 +65,8 @@ public class ConnectionTCP extends AbstractTCPNode {
         } catch (IOException e) {
             throw new IOException("Error: could not establish client socket connection. Client shutting down...");
         }
+
+        return null;
     }
 
 }

@@ -226,6 +226,11 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
   }
 
   @Override
+  public void setUserPortNumber(String entityID, int portNo) throws RemoteException {
+    userRecord.get(entityID).setSOCKET_PORT(portNo);
+  }
+
+  @Override
   public void sendHeartBeat(UserInfoPayload clientInfo) throws RemoteException {
     try {
       String remoteHost = RemoteServer.getClientHost();
