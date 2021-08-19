@@ -55,7 +55,6 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
   private Integer maxID;
   private Integer last_accepted_proposalID;
   private Replicable last_accepted_value;
-  protected boolean isAcceptorFailed;
   private ConcurrentHashMap<Integer, Replicable> announcementMap;
 
   public BrokerImpl(String ADMIN_HOST, Integer ADMIN_PORT, Integer SELF_PORT)
@@ -64,8 +63,10 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
     this.ADMIN_HOST = ADMIN_HOST;
     this.ADMIN_PORT = ADMIN_PORT;
     this.SELF_PORT = SELF_PORT;
+    this.announcementMap = new ConcurrentHashMap<>();
 
     this.selfRecord = new BrokerInfoPayload(UUID.randomUUID().toString(), SELF_PORT, true);
+    OutputHandler.printWithTimestamp(String.format("Broker Info: %s", selfRecord));
     try {
       this.adminServer = RMIHandler.fetchRemoteObject("Admin", ADMIN_HOST,
           ADMIN_PORT);
@@ -73,6 +74,7 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
       if (connectAdmin) {
         OutputHandler.printWithTimestamp(String.format("Connected to Admin server!"));
         getActivePeers(adminServer);
+        updateActiveUsers();
       }
 
       this.adminProposer = RMIHandler.fetchRemoteObject("Admin", ADMIN_HOST,
@@ -89,8 +91,8 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
         new ClientStatusChecker(this.userTimeouts, this, new Long(2)), 2, 2, TimeUnit.SECONDS);
 
     announcementProcessorService.scheduleAtFixedRate(
-        new AnnouncementProcessor(announcementMap), 100, 100,
-        TimeUnit.MILLISECONDS);
+        new AnnouncementProcessor(announcementMap), 1, 1,
+        TimeUnit.SECONDS);
   }
 
   protected BrokerImpl() throws RemoteException {
@@ -109,6 +111,29 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
           String.format("Added Active peer with id: %s and Host: %s", peer.getEntityID(),
               peer.getHOST()));
     }
+  }
+
+  private void updateActiveUsers() {
+    Broker peerBrokerStub = null;
+    for (BrokerInfoPayload peer : peerBrokers.values()) {
+      peerBrokerStub = RMIHandler.fetchRemoteObject("Broker", peer.getHOST(), peer.getPORT());
+      if (peerBrokerStub != null) {
+        break;
+      }
+    }
+    try {
+      ArrayList<UserInfoPayload> activeUsers = (ArrayList<UserInfoPayload>) peerBrokerStub.getActiveUsers();
+      for (UserInfoPayload user : activeUsers) {
+        this.userRecord.put(user.getEntityID(), user);
+      }
+      OutputHandler.printWithTimestamp(
+          String.format("Added %d Active user(s) fetched from Peer broker", activeUsers.size()));
+    } catch (RemoteException e) {
+      e.printStackTrace();
+      updateActiveUsers();
+    }
+
+
   }
 
   @Override
@@ -142,6 +167,7 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
       this.userRecord.put(userInfoPayload.getEntityID(), userInfoPayload);
       this.userTimeouts.put(userInfoPayload.getEntityID(), System.currentTimeMillis());
       this.adminProposer.submitRequest(userInfoPayload);
+      OutputHandler.printWithTimestamp(String.format("User registered: %s", userInfoPayload));
       return true;
     }
     return false;
@@ -201,8 +227,8 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
     try {
       String remoteHost = RemoteServer.getClientHost();
       clientInfo.setHOST(remoteHost);
-      OutputHandler.printWithTimestamp(
-          String.format("Heartbeat Received from Client at: %s", remoteHost));
+//      OutputHandler.printWithTimestamp(
+//          String.format("Heartbeat Received from Client at: %s", remoteHost));
     } catch (ServerNotActiveException e) {
       e.printStackTrace();
     }
@@ -307,6 +333,10 @@ class AnnouncementProcessor extends BrokerImpl implements Runnable {
       if (requestPayload instanceof UserInfoPayload) {
         userRecord.put(((UserInfoPayload) requestPayload).getEntityID(),
             (UserInfoPayload) requestPayload);
+        OutputHandler.printWithTimestamp(
+            String.format("User data replicated for new user with ID: %s at HOST: %s",
+                ((UserInfoPayload) requestPayload).getEntityID(),
+                ((UserInfoPayload) requestPayload).getHOST()));
       }
       this.announcementMap.remove(proposalID);
     }

@@ -13,7 +13,7 @@ public class StartAdmin {
     Takes only 1 CMD Argument, i.e. the port on which the admin rmi will run.
    */
   public static void main(String[] args) {
-    System.setProperty("sun.rmi.transport.tcp.responseTimeout", "200");
+//    System.setProperty("sun.rmi.transport.tcp.responseTimeout", "200");
     Registry registry;
     Integer PORT = Integer.valueOf(args[0]);
 

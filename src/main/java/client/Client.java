@@ -34,6 +34,7 @@ public class Client implements ClientToBrokerInterface {
     this.adminPort = adminPort;
 
     this.selfRecord = new UserInfoPayload(UUID.randomUUID().toString(), username, true);
+    OutputHandler.printWithTimestamp(String.format("Client Info: %s", selfRecord));
   }
 
 
