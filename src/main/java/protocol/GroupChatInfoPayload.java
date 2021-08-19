@@ -1,11 +1,12 @@
 package protocol;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class GroupChatInfoPayload implements GroupChat {
+public class GroupChatInfoPayload implements GroupChat, Serializable {
 
   private String groupID = UUID.randomUUID().toString();
   private String groupName;

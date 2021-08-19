@@ -1,11 +1,9 @@
 package protocol;
 
-import java.io.Serializable;
-
 /**
  * Represents a payload with information on a user or chat client
  */
-public class UserInfoPayload extends AbstractNetworkEntity implements Serializable {
+public class UserInfoPayload extends AbstractNetworkEntity implements Replicable {
 
   private String userName;
   private String SOCKET_PORT;

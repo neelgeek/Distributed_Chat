@@ -27,8 +27,5 @@ public class StartClient {
     Client client = new Client(username, adminHost, adminPORT);
     client.discoverBroker();
     client.registerRMI(rmiName, clientPort, successMessage);
-    client.registerUser();
-    client.startSendingHearbeat();
-
   }
 }
