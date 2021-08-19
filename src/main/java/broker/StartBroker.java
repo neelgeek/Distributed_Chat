@@ -5,7 +5,8 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.UUID;
+import protocol.GroupChat;
+import protocol.GroupChatInfoPayload;
 
 /**
  * Starts new Brokers
@@ -26,7 +27,6 @@ public class StartBroker {
     String ADMIN_HOST = args[0];
     Integer ADMIN_PORT = Integer.valueOf(args[1]);
     Integer PORT = Integer.valueOf(args[2]);
-
     try {
       Broker broker = new BrokerImpl(ADMIN_HOST, ADMIN_PORT, PORT);
       registry = LocateRegistry.createRegistry(PORT);

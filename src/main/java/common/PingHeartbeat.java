@@ -35,8 +35,8 @@ public class PingHeartbeat<I> implements Runnable {
 
     try {
       this.serverStub.sendHeartBeat(selfInfo);
-      OutputHandler.printWithTimestamp(
-          "Sent Broker heart beat to " + SERVER_STUB_NAME);
+//      OutputHandler.printWithTimestamp(
+//          "Sent Broker heart beat to " + SERVER_STUB_NAME);
     } catch (RemoteException | NullPointerException e) {
       OutputHandler.printWithTimestamp(
           "ERROR: Unable to connect to the " + SERVER_STUB_NAME + " for sending heartbeat");

@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Represents a payload with the information of a broker
  */
-public class BrokerInfoPayload extends AbstractNetworkEntity implements Serializable {
+public class BrokerInfoPayload extends AbstractNetworkEntity implements Serializable, Replicable {
 
   public BrokerInfoPayload() {
   }

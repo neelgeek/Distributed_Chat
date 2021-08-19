@@ -47,4 +47,14 @@ public abstract class AbstractNetworkEntity implements Serializable {
   public void setHOST(String HOST) {
     this.HOST = HOST;
   }
+
+  @Override
+  public String toString() {
+    return "{" +
+        "entityID='" + entityID + '\'' +
+        ", HOST='" + HOST + '\'' +
+        ", PORT=" + PORT +
+        ", isActive=" + isActive +
+        '}';
+  }
 }

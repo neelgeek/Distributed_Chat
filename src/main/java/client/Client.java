@@ -34,6 +34,7 @@ public class Client implements ClientToBrokerInterface {
     this.adminPort = adminPort;
 
     this.selfRecord = new UserInfoPayload(UUID.randomUUID().toString(), username, true);
+    OutputHandler.printWithTimestamp(String.format("Client Info: %s", selfRecord));
   }
 
 
@@ -75,7 +76,10 @@ public class Client implements ClientToBrokerInterface {
       assert admin != null;
       bip = admin.registerNewUser(uip);
       brokerStub = RMIHandler.fetchRemoteObject(brokerName, bip.getHOST(), bip.getPORT());
+      registerUser();
+      startSendingHearbeat();
     } catch (NullPointerException e) {
+      e.printStackTrace();
       OutputHandler.printWithTimestamp("Error: admin object is null");
     } catch (RemoteException | InterruptedException e) {
       e.printStackTrace();
