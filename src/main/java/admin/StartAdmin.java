@@ -16,7 +16,7 @@ public class StartAdmin {
 
   public static void main(String[] args) throws FileNotFoundException {
 
-    System.setProperty("sun.rmi.transport.tcp.responseTimeout", "500");
+    System.setProperty("sun.rmi.transport.tcp.responseTimeout", "200");
     Registry registry;
     Integer PORT = Integer.valueOf(args[0]);
     Integer PRIORITY = Integer.valueOf(args[1]);

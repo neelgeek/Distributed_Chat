@@ -254,8 +254,8 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, AdminPee
   public void announceCoordinator(AdminInfoPayload leader) throws RemoteException {
     OutputHandler.printWithTimestamp(
         String.format("Leader announcement received, setting new leader to: %s", leader));
-    currentLeader = leader;
     RECEIVED_COORDINATOR_ANNOUNCEMENT = true;
+    currentLeader = leader;
     endElection();
   }
 
@@ -435,12 +435,12 @@ class ElectionProcessor extends UnicastRemoteObject implements Runnable, Remote,
         try {
           peerStub.startElection(this);
         } catch (RemoteException e) {
-          System.err.println(e.getMessage());
+          OutputHandler.printWithTimestamp("ERROR" + e.getMessage());
         }
       }
     }
     try {
-      Thread.sleep(500);
+      Thread.sleep(100);
       if (!ANSWER_RECEIVED) {
         // Make myself co-coordinator
         OutputHandler.printWithTimestamp("No answer received, announcing self as Leader");
@@ -455,7 +455,7 @@ class ElectionProcessor extends UnicastRemoteObject implements Runnable, Remote,
             try {
               peerStub.announceCoordinator(master.getSelfInfo());
             } catch (RemoteException e) {
-              System.err.println(e.getMessage());
+              OutputHandler.printWithTimestamp("ERROR" + e.getMessage());
             }
           }
         }
@@ -463,7 +463,7 @@ class ElectionProcessor extends UnicastRemoteObject implements Runnable, Remote,
       } else {
         OutputHandler.printWithTimestamp("Answer received, waiting for Leader Announcement");
         // wait for some time to receive the coordinator message
-        Thread.sleep(500);
+        Thread.sleep(100);
         // if still no co-coordinator, start a new election
         if (!master.RECEIVED_COORDINATOR_ANNOUNCEMENT) {
           OutputHandler.printWithTimestamp(
@@ -473,7 +473,7 @@ class ElectionProcessor extends UnicastRemoteObject implements Runnable, Remote,
         }
       }
     } catch (InterruptedException | RemoteException e) {
-      System.err.println(e.getMessage());
+      OutputHandler.printWithTimestamp("ERROR" + e.getMessage());
     }
     master.endElection();
   }

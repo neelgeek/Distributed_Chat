@@ -2,16 +2,21 @@
   {
     "HOST": "127.0.0.1",
     "PORT": 1081,
-    "PRIORITY": 3
+    "PRIORITY": 4
   },
   {
     "HOST": "127.0.0.1",
     "PORT": 1082,
-    "PRIORITY": 2
+    "PRIORITY": 3
   },
   {
     "HOST": "127.0.0.1",
     "PORT": 1083,
+    "PRIORITY": 2
+  },
+  {
+    "HOST": "127.0.0.1",
+    "PORT": 1084,
     "PRIORITY": 1
   }
 ]
