@@ -37,12 +37,18 @@ public class PeerListener extends Thread {
         this.connectedPeers = connectedPeers;
     }
 
+    public void setTargetPeer(UserInfoPayload targetPeer) {
+        this.targetPeer = targetPeer;
+    }
+
     public Socket getS_client() {
         return s_client;
     }
 
     public void run() {
 
+        // DEBUG
+        System.out.println("Running peer listener on" + s_client.getLocalPort() + " to target "+ s_client.getPort());
 
         try {
             s1In = s_client.getInputStream();
@@ -50,18 +56,31 @@ public class PeerListener extends Thread {
             s1out = s_client.getOutputStream();
             dos = new DataOutputStream(s1out);
 
+
+            boolean userInfoSent = false;
+
             // get the first message from the user that contains sender info
             while (true) {
                 if (dis.available() > 0) {
                     String uip_str = dis.readUTF();
-                    targetPeer = ProtocolHandler.decodeJSONUserInfo(uip_str);
-                    assert targetPeer != null;
+                    if (ProtocolHandler.decodeJSONUserInfo(uip_str) != null) {
+                        targetPeer = ProtocolHandler.decodeJSONUserInfo(uip_str);
+                        userInfoSent = true;
+                    }
                     OutputHandler.printWithTimestamp("Connected with user: \n" + targetPeer.getUserName());
+
+                    if (!userInfoSent) {
+                        String message = uip_str;
+                        OutputHandler.printWithTimestamp(targetPeer.getUserName() + ": " + message);
+                    }
                     break;
                 }
             }
 
+
+
             connectedPeers.put(targetPeer.getUserName(), s_client);
+
 
             // loop for listening to messages
             while(true) {

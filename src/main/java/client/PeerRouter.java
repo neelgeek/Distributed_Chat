@@ -1,10 +1,12 @@
 package client;
 
 import client.ThreadingTCP.ClientToThreadInterface;
+import client.ThreadingTCP.PeerListener;
 import common.OutputHandler;
 import protocol.ProtocolHandler;
 import protocol.UserInfoPayload;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,7 +24,7 @@ public class PeerRouter {
         PeerRouter.connectedPeers = connectedPeers;
     }
 
-    public static void sendMessageToPeer(String targetUsername, String message, List<UserInfoPayload> allActiveUsers) {
+    public static void sendMessageToPeer(UserInfoPayload sender, String targetUsername, String message, List<UserInfoPayload> allActiveUsers) {
 
         try {
 
@@ -34,6 +36,7 @@ public class PeerRouter {
                     OutputStream os = targetSocket.getOutputStream();
                     DataOutputStream dos = new DataOutputStream(os);
                     dos.writeUTF(message);
+
                     return;
                 }
             }
@@ -42,11 +45,17 @@ public class PeerRouter {
             // containing the user payloaf info and then send the message
             for (UserInfoPayload user : allActiveUsers) {
                 if (user.getUserName().equals(targetUsername)) {
+                    //DEBUG
+                    System.out.println(user);
+
                     Socket newSocket = new Socket(user.getHOST(), user.getSOCKET_PORT());
+                    PeerListener listener = new PeerListener(newSocket, connectedPeers);
+                    listener.setTargetPeer(user);
+                    listener.start();
                     connectedPeers.put(user.getUserName(), newSocket);
                     OutputStream os = newSocket.getOutputStream();
                     DataOutputStream dos = new DataOutputStream(os);
-                    dos.writeUTF(ProtocolHandler.encodeJSONUserInfo(user));
+                    dos.writeUTF(ProtocolHandler.encodeJSONUserInfo(sender));
                     dos.writeUTF(message);
                     return;
                 }

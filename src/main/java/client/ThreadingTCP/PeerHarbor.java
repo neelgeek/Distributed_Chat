@@ -32,16 +32,25 @@ public class PeerHarbor extends Thread {
     public void run() {
 
         while(true) {
+            Socket s_client = null;
             try {
-                Socket s_client = s.accept();
+                s_client = s.accept();
+
+                //DEBUG
+                System.out.println("Connection accepted");
+                System.out.println(s_client);
+
                 boolean seenBefore = false;
-                for (Socket soc : connectedPeers.values()) {
+                /*for (Socket soc : connectedPeers.values()) {
                     if (soc.getLocalAddress().equals(s_client.getLocalAddress()) &&
                             soc.getLocalPort() == s_client.getLocalPort()) {
                         seenBefore = true;
+
+                        //DEBUG
+                        System.out.println("Has seen it before");
                         break;
                     }
-                }
+                }*/
 
                 if (!seenBefore) {
                     PeerListener listener = new PeerListener(s_client, connectedPeers);

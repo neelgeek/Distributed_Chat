@@ -148,7 +148,7 @@ public class Client implements ClientToBrokerInterface, ClientToThreadInterface 
   }
 
   public void sendMessageToPeer(String username, String message) throws RemoteException {
-    PeerRouter.sendMessageToPeer(username, message, brokerStub.getActiveUsers());
+    PeerRouter.sendMessageToPeer(selfRecord, username, message, brokerStub.getActiveUsers());
   }
 
 
