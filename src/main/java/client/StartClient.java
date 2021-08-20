@@ -1,9 +1,6 @@
 package client;
 
-import protocol.UserInfoPayload;
-
 import java.rmi.RemoteException;
-import java.util.List;
 
 public class StartClient {
 
@@ -31,9 +28,9 @@ public class StartClient {
     client.discoverBroker();
     client.registerRMI(rmiName, clientPort, successMessage);
 
-    client.startPeerListener(0);
-    client.connectWithAllPeers();
-    client.startPeerReplier();
+    client.startPeerHarbor(0);
+    // client.connectWithAllPeers();
+    client.startClient();
 
     /*List<UserInfoPayload> users = client.getActiveUsers();
     System.out.println("Active Users:");

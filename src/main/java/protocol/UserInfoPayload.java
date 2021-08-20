@@ -1,5 +1,7 @@
 package protocol;
 
+import java.net.Socket;
+
 /**
  * Represents a payload with information on a user or chat client
  */
@@ -8,8 +10,12 @@ public class UserInfoPayload extends AbstractNetworkEntity implements Replicable
   private String userName;
 
 
-
+  // port number of the server socket (i.e. the PeerHarbor) of the user
   private int SOCKET_PORT;
+
+  // the client socket of this user as seen by another particular user. The same user
+  // can have different values for this according to which user you view it from
+  // private Socket userSocket;
 
   public UserInfoPayload() {
   }
@@ -43,4 +49,12 @@ public class UserInfoPayload extends AbstractNetworkEntity implements Replicable
   public void setSOCKET_PORT(int SOCKET_PORT) {
     this.SOCKET_PORT = SOCKET_PORT;
   }
+
+//  public Socket getUserSocket() {
+//    return userSocket;
+//  }
+//
+//  public void setUserSocket(Socket userSocket) {
+//    this.userSocket = userSocket;
+//  }
 }

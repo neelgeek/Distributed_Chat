@@ -1,12 +1,15 @@
 package client.ThreadingTCP;
 
 import common.OutputHandler;
+import protocol.ProtocolHandler;
+import protocol.UserInfoPayload;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Map;
 
 public class PeerListener extends Thread {
 
@@ -19,53 +22,56 @@ public class PeerListener extends Thread {
     protected int destPortNo;
     protected InetAddress destIP;
 
-    private ServerSocket s;
+    private UserInfoPayload targetPeer;
+
+
+
+    private Socket s_client;
     ClientToThreadInterface myClient;
+    private Map<String, Socket> connectedPeers;
 
 
     // portNo == 0 means it's automatically allocated
-    public PeerListener(ClientToThreadInterface myClient, int portNo) {
-        try {
-            s = new ServerSocket(portNo);
-            myClient.setListenerPort(s.getLocalPort());
-            OutputHandler.printWithTimestamp("Success: created peer listener on port " + s.getLocalPort());
-            this.myClient = myClient;
-        } catch (IOException e) {
-            OutputHandler.printWithTimestamp("Error: Could not create server socket");
-            e.printStackTrace();
-        }
+    public PeerListener(Socket s_client, Map<String, Socket> connectedPeers) {
+        this.s_client = s_client;
+        this.connectedPeers = connectedPeers;
+    }
+
+    public Socket getS_client() {
+        return s_client;
     }
 
     public void run() {
-            try (Socket s1 = s.accept()) {
 
 
+        try {
+            s1In = s_client.getInputStream();
+            dis = new DataInputStream(s1In);
+            s1out = s_client.getOutputStream();
+            dos = new DataOutputStream(s1out);
 
-                myClient.startPeerListener(0);
-
-
-                s1In = s1.getInputStream();
-                dis = new DataInputStream(s1In);
-                s1out = s1.getOutputStream();
-                dos = new DataOutputStream(s1out);
-
-                // TODO: as of now, only one group exists
-                myClient.addPeerToOutputStream(dos);
-
-                // sendMessageAndLog("Success: Client connection established", "Response");
-                // destIP = s1.getInetAddress();
-                // destPortNo = s1.getPort();
-
-                // TODO: change to accept uip!!
-                while (true) {
-                    if (dis.available() > 0) {
-                        String input = dis.readUTF();
-                        OutputHandler.printWithTimestamp("Message from peer: \n" + input);
-                    }
+            // get the first message from the user that contains sender info
+            while (true) {
+                if (dis.available() > 0) {
+                    String uip_str = dis.readUTF();
+                    targetPeer = ProtocolHandler.decodeJSONUserInfo(uip_str);
+                    assert targetPeer != null;
+                    OutputHandler.printWithTimestamp("Connected with user: \n" + targetPeer.getUserName());
+                    break;
                 }
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+
+            connectedPeers.put(targetPeer.getUserName(), s_client);
+
+            // loop for listening to messages
+            while(true) {
+                if (dis.available() > 0) {
+                    String message = dis.readUTF();
+                    OutputHandler.printWithTimestamp(targetPeer.getUserName() + ": " + message);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

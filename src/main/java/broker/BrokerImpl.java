@@ -87,8 +87,8 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
         new PingHeartbeat(ADMIN_HOST, ADMIN_PORT, "Admin", selfRecord), 1, 1,
         TimeUnit.SECONDS);
 
-    this.clientStatusService.scheduleAtFixedRate(
-        new ClientStatusChecker(this.userTimeouts, this, new Long(2)), 2, 2, TimeUnit.SECONDS);
+    // this.clientStatusService.scheduleAtFixedRate(
+        // new ClientStatusChecker(this.userTimeouts, this, new Long(2)), 2, 2, TimeUnit.SECONDS);
 
     announcementProcessorService.scheduleAtFixedRate(
         new AnnouncementProcessor(announcementMap), 1, 1,

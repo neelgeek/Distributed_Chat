@@ -8,11 +8,10 @@ import java.util.List;
 
 public interface ClientToThreadInterface {
 
-    void addPeerToOutputStream(DataOutputStream dos);
+    // void addPeerToGroup(UserInfoPayload uip);
 
-    void startPeerListener(int portNo);
+    void startPeerHarbor(int portNo) throws RemoteException;
 
-    List<DataOutputStream> getAllOutputStreams();
+    // List<UserInfoPayload> getAllConnectedPeers();
 
-    void setListenerPort(int portNo) throws RemoteException;
 }

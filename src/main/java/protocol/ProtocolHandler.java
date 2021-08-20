@@ -17,18 +17,7 @@ public class ProtocolHandler {
    * @param payload Payload to be encoded
    * @return JSON object converted to string format
    */
-  public static String encodeJSONRequest(Message payload) {
-    JSONObject encodedPayload = new JSONObject(payload);
-    return encodedPayload.toString();
-  }
-
-  /**
-   * Converts the response payload to JSON format.
-   *
-   * @param payload Payload to be encoded
-   * @return JSON object converted to string format
-   */
-  public static String encodeJSONResponse(Message payload) {
+  public static String encodeJSONMessage(Message payload) {
     JSONObject encodedPayload = new JSONObject(payload);
     return encodedPayload.toString();
   }
@@ -40,7 +29,7 @@ public class ProtocolHandler {
    * @param pojo
    * @return Response parsed to {@link ResponsePayload} format
    */
-  public static Message decodeJSONResponse(String encodedPayload) {
+  public static Message decodeJSONMessage(String encodedPayload) {
     try {
       Message javaObject = new Gson().fromJson(encodedPayload, Message.class);
       return javaObject;
@@ -50,16 +39,15 @@ public class ProtocolHandler {
     return null;
   }
 
-  /**
-   * Converts the request from the client to {@link RequestPayload} object
-   *
-   * @param encodedPayload Request from the client in String format
-   * @return Request parsed to {@link RequestPayload} format
-   */
-  public static Message decodeJSONRequest(String encodedPayload) {
+  public static String encodeJSONUserInfo(UserInfoPayload uip) {
+    JSONObject encodedPayload = new JSONObject(uip);
+    return encodedPayload.toString();
+  }
+
+  public static UserInfoPayload decodeJSONUserInfo(String encodedPayload) {
     try {
-      Message payload = new Gson().fromJson(encodedPayload, Message.class);
-      return payload;
+      UserInfoPayload javaObject = new Gson().fromJson(encodedPayload, UserInfoPayload.class);
+      return javaObject;
     } catch (JsonSyntaxException e) {
 
     }

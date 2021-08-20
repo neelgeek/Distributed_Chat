@@ -3,22 +3,19 @@ package client;
 import admin.Admin;
 import broker.Broker;
 import client.ThreadingTCP.ClientToThreadInterface;
+import client.ThreadingTCP.PeerHarbor;
 import client.ThreadingTCP.PeerListener;
-import client.ThreadingTCP.PeerReplier;
 import common.OutputHandler;
 import common.PingHeartbeat;
 import common.RMIHandler;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -38,9 +35,9 @@ public class Client implements ClientToBrokerInterface, ClientToThreadInterface 
   private BrokerInfoPayload bip = null;
   private Broker brokerStub;
 
-  private List<PeerListener> listeners = new ArrayList<>();
-  private List<Socket> peerSockets = new ArrayList<>();
-  private PeerReplier replier;
+  private PeerHarbor harbor;
+
+  private Map<String, Socket> connectedPeers = new HashMap<>();
 
   private UserInfoPayload selfRecord;
   private ScheduledExecutorService clientHeartbeatService = Executors.newSingleThreadScheduledExecutor();
@@ -53,6 +50,7 @@ public class Client implements ClientToBrokerInterface, ClientToThreadInterface 
 
     this.selfRecord = new UserInfoPayload(UUID.randomUUID().toString(), username, true);
     OutputHandler.printWithTimestamp(String.format("Client Info: %s", selfRecord));
+    PeerRouter.setConnectedPeers(connectedPeers);
   }
 
 
@@ -114,6 +112,22 @@ public class Client implements ClientToBrokerInterface, ClientToThreadInterface 
     return false;
   }
 
+  public void startClient() throws RemoteException {
+    String targetUser = "";
+    while (true) {
+      Scanner sc = new Scanner(System.in);
+      String user = sc.nextLine();
+      String message = sc.nextLine();
+
+      if (!user.equals("")) {
+        sendMessageToPeer(user, message);
+        targetUser = user;
+      } else {
+        sendMessageToPeer(targetUser, message);
+      }
+    }
+  }
+
 
   @Override
   public void sendUserUpdateInfo(List userUpdateInfo) throws RemoteException {
@@ -121,54 +135,38 @@ public class Client implements ClientToBrokerInterface, ClientToThreadInterface 
   }
   // entid
 
-  public void sendMessageToPeer(UserInfoPayload peer) {
-
+  @Override
+  public void startPeerHarbor(int portNo) throws RemoteException {
+    this.harbor = new PeerHarbor(portNo, connectedPeers);
+    setListenerPort(harbor.getHarborPort());
+    harbor.start();
   }
 
-  @Override
-  public void startPeerListener(int portNo) {
-    PeerListener listener = new PeerListener(this, portNo);
-    listeners.add(listener);
-    listener.start();
-  }
-
-  //TODO: will not work with multiple peers unless user payload is a remote object
-  @Override
-  public void setListenerPort(int portNo) throws RemoteException {
+  private void setListenerPort(int portNo) throws RemoteException {
     selfRecord.setSOCKET_PORT(portNo);
     brokerStub.setUserPortNumber(selfRecord.getEntityID(), portNo);
   }
 
-  public void startPeerReplier() {
-    replier = new PeerReplier(this);
-    replier.start();
+  public void sendMessageToPeer(String username, String message) throws RemoteException {
+    PeerRouter.sendMessageToPeer(username, message, brokerStub.getActiveUsers());
   }
 
-  @Override
-  public List<DataOutputStream> getAllOutputStreams() {
-    return peerOutputStreams;
-  }
-
-  @Override
-  public void addPeerToOutputStream(DataOutputStream dos) {
-    peerOutputStreams.add(dos);
-  }
 
   private List<UserInfoPayload> getActiveUsers() throws RemoteException {
     return brokerStub.getActiveUsers();
   }
 
   // TODO: check to see if a client is already connected!
-  public void connectWithAllPeers() throws RemoteException {
+  /*public void connectWithAllPeers() throws RemoteException {
     List<UserInfoPayload> uips = brokerStub.getActiveUsers();
 
     for (UserInfoPayload user : uips) {
       if (user.getUserName().equals(this.selfRecord.getUserName())) {
         continue;
       }
-      String host = user.getHOST();
-      int portNo = user.getSOCKET_PORT();
+
       try {
+        PeerRouter.sendMessageToPeer(user.getUserName(), "", );
         Socket s1 = new Socket(host, portNo);
         peerSockets.add(s1);
         OutputHandler.printWithTimestamp("Success: connected with" + user.getUserName() + " on " + portNo);
@@ -183,7 +181,7 @@ public class Client implements ClientToBrokerInterface, ClientToThreadInterface 
         e.printStackTrace();
       }
     }
-  }
+  }*/
 
 
 }
