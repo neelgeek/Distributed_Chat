@@ -36,10 +36,6 @@ public class PeerHarbor extends Thread {
             try {
                 s_client = s.accept();
 
-                //DEBUG
-                System.out.println("Connection accepted");
-                System.out.println(s_client);
-
                 boolean seenBefore = false;
                 /*for (Socket soc : connectedPeers.values()) {
                     if (soc.getLocalAddress().equals(s_client.getLocalAddress()) &&

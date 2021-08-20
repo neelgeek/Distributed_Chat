@@ -47,9 +47,6 @@ public class PeerListener extends Thread {
 
     public void run() {
 
-        // DEBUG
-        System.out.println("Running peer listener on" + s_client.getLocalPort() + " to target "+ s_client.getPort());
-
         try {
             s1In = s_client.getInputStream();
             dis = new DataInputStream(s1In);

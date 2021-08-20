@@ -49,12 +49,4 @@ public class UserInfoPayload extends AbstractNetworkEntity implements Replicable
   public void setSOCKET_PORT(int SOCKET_PORT) {
     this.SOCKET_PORT = SOCKET_PORT;
   }
-
-//  public Socket getUserSocket() {
-//    return userSocket;
-//  }
-//
-//  public void setUserSocket(Socket userSocket) {
-//    this.userSocket = userSocket;
-//  }
 }
