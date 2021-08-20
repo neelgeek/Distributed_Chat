@@ -76,5 +76,7 @@ public interface Broker extends Remote {
    */
   boolean leaveGroupChat(UserInfoPayload leavingUser, GroupChat groupChat) throws RemoteException;
 
+  void setUserPortNumber(String entityID, int portNo) throws RemoteException;
+
 
 }

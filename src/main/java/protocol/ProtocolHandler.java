@@ -2,6 +2,7 @@ package protocol;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import common.Message;
 import org.json.JSONObject;
 
 /**
@@ -10,59 +11,48 @@ import org.json.JSONObject;
  */
 public class ProtocolHandler {
 
-//  /**
-//   * Converts the request payload to JSON format.
-//   *
-//   * @param payload Payload to be encoded
-//   * @return JSON object converted to string format
-//   */
-//  public static String encodeJSONRequest(RequestPayload payload) {
-//    JSONObject encodedPayload = new JSONObject(payload);
-//    return encodedPayload.toString();
-//  }
-//
-//  /**
-//   * Converts the response payload to JSON format.
-//   *
-//   * @param payload Payload to be encoded
-//   * @return JSON object converted to string format
-//   */
-//  public static String encodeJSONResponse(ResponsePayload payload) {
-//    JSONObject encodedPayload = new JSONObject(payload);
-//    return encodedPayload.toString();
-//  }
-//
-//  /**
-//   * Converts the response from the server to {@link ResponsePayload} object
-//   *
-//   * @param encodedPayload Response from the server in String format
-//   * @return Response parsed to {@link ResponsePayload} format
-//   */
-//  public static ResponsePayload decodeJSONResponse(String encodedPayload) {
-//    try {
-//      ResponsePayload payload = new Gson().fromJson(encodedPayload, ResponsePayload.class);
-//      return payload;
-//    } catch (JsonSyntaxException e) {
-//
-//    }
-//    return null;
-//  }
-//
-//  /**
-//   * Converts the request from the client to {@link RequestPayload} object
-//   *
-//   * @param encodedPayload Request from the client in String format
-//   * @return Request parsed to {@link RequestPayload} format
-//   */
-//  public static RequestPayload decodeJSONRequest(String encodedPayload) {
-//    try {
-//      RequestPayload payload = new Gson().fromJson(encodedPayload, RequestPayload.class);
-//      return payload;
-//    } catch (JsonSyntaxException e) {
-//
-//    }
-//    return null;
-//  }
+  /**
+   * Converts the request payload to JSON format.
+   *
+   * @param payload Payload to be encoded
+   * @return JSON object converted to string format
+   */
+  public static String encodeJSONMessage(Message payload) {
+    JSONObject encodedPayload = new JSONObject(payload);
+    return encodedPayload.toString();
+  }
+
+  /**
+   * Converts the response from the server to {@link ResponsePayload} object
+   *
+   * @param encodedPayload Response from the server in String format
+   * @param pojo
+   * @return Response parsed to {@link ResponsePayload} format
+   */
+  public static Message decodeJSONMessage(String encodedPayload) {
+    try {
+      Message javaObject = new Gson().fromJson(encodedPayload, Message.class);
+      return javaObject;
+    } catch (JsonSyntaxException e) {
+
+    }
+    return null;
+  }
+
+  public static String encodeJSONUserInfo(UserInfoPayload uip) {
+    JSONObject encodedPayload = new JSONObject(uip);
+    return encodedPayload.toString();
+  }
+
+  public static UserInfoPayload decodeJSONUserInfo(String encodedPayload) {
+    try {
+      UserInfoPayload javaObject = new Gson().fromJson(encodedPayload, UserInfoPayload.class);
+      return javaObject;
+    } catch (JsonSyntaxException e) {
+
+    }
+    return null;
+  }
 
 }
 
