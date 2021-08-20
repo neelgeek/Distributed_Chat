@@ -101,5 +101,4 @@ public class Client implements ClientToBrokerInterface {
   public void sendUserUpdateInfo(List userUpdateInfo) throws RemoteException {
 
   }
-  // entid
 }

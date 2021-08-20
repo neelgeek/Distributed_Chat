@@ -9,7 +9,7 @@ public abstract class AbstractNetworkEntity implements Serializable {
   private int PORT;
   private boolean isActive;
 
-  protected AbstractNetworkEntity() {
+  public AbstractNetworkEntity() {
   }
 
   public AbstractNetworkEntity(String entityID, String HOST, int PORT, boolean isActive) {

@@ -32,7 +32,6 @@ public class PingHeartbeat<I> implements Runnable {
     if (this.serverStub == null) {
       this.serverStub = getServerStub();
     }
-
     try {
       this.serverStub.sendHeartBeat(selfInfo);
 //      OutputHandler.printWithTimestamp(
