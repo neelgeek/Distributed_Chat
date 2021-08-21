@@ -2,6 +2,7 @@ package broker;
 
 import admin.Admin;
 import admin.PaxosProposer;
+import common.AnnouncementProcessor;
 import common.ClientStatusChecker;
 import common.HeartbeatReceiver;
 import common.OutputHandler;
@@ -23,6 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import protocol.AdminInfoPayload;
 import protocol.BrokerInfoPayload;
 import protocol.GroupChat;
 import protocol.GroupChatInfoPayload;
@@ -49,7 +51,7 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
   private ScheduledExecutorService clientStatusService = Executors.newSingleThreadScheduledExecutor();
   private ScheduledExecutorService announcementProcessorService = Executors.newScheduledThreadPool(
       1);
-  ;
+  PingHeartbeat<BrokerInfoPayload> pingProcess;
 
   // For Paxos
   private Integer maxID;
@@ -83,15 +85,16 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
       e.printStackTrace();
     }
 
+    pingProcess = new PingHeartbeat(ADMIN_HOST, ADMIN_PORT, "Admin", selfRecord);
     this.brokerHeartbeatService.scheduleAtFixedRate(
-        new PingHeartbeat(ADMIN_HOST, ADMIN_PORT, "Admin", selfRecord), 1, 1,
+        pingProcess, 1, 1,
         TimeUnit.SECONDS);
 
     this.clientStatusService.scheduleAtFixedRate(
         new ClientStatusChecker(this.userTimeouts, this, new Long(2)), 2, 2, TimeUnit.SECONDS);
 
     announcementProcessorService.scheduleAtFixedRate(
-        new AnnouncementProcessor(announcementMap), 1, 1,
+        new AnnouncementProcessor(announcementMap, this), 1, 1,
         TimeUnit.SECONDS);
   }
 
@@ -228,6 +231,18 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
   @Override
   public void setUserPortNumber(String entityID, int portNo) throws RemoteException {
     userRecord.get(entityID).setSOCKET_PORT(portNo);
+//    adminProposer.submitRequest(userRecord.get(entityID));
+  }
+
+  @Override
+  public void announceNewLeader(AdminInfoPayload leaderAdmin) throws RemoteException {
+    OutputHandler.printWithTimestamp("Updating Admin to new Leader");
+    this.adminServer = RMIHandler.fetchRemoteObject("Admin", leaderAdmin.getHOST(),
+        leaderAdmin.getPORT());
+    this.adminProposer = (PaxosProposer) adminServer;
+    this.ADMIN_HOST = leaderAdmin.getHOST();
+    this.ADMIN_PORT = leaderAdmin.getPORT();
+    pingProcess.updateAdmin(ADMIN_HOST, ADMIN_PORT);
   }
 
   @Override
@@ -301,6 +316,16 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
     this.announcementMap.put(acceptedValue.getProposalID(), acceptedValue.getProposedValue());
   }
 
+  @Override
+  public void put(String entityID, Replicable toReplicate) {
+    this.userRecord.put(entityID, (UserInfoPayload) toReplicate);
+  }
+
+  @Override
+  public void remove(String entityID) {
+    this.userRecord.remove(entityID);
+  }
+
   private void endPaxosRun() {
     this.last_accepted_proposalID = null;
     this.last_accepted_value = null;
@@ -323,44 +348,3 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
 }
 
 
-/**
- * The Announcements from the Acceptors are added to a {@link ConcurrentHashMap} named
- * announcementMap so that duplicate transactions don't take place in the store. This thread
- * periodically checks the operations accumulated in the map and then starts new threads to carry
- * them out on the key value store.
- */
-class AnnouncementProcessor extends BrokerImpl implements Runnable {
-
-  private ConcurrentHashMap<Integer, Replicable> announcementMap;
-
-  public AnnouncementProcessor(
-      ConcurrentHashMap<Integer, Replicable> announcementMap) throws RemoteException {
-    super();
-    this.announcementMap = announcementMap;
-  }
-
-  @Override
-  public void run() {
-    for (Integer proposalID : this.announcementMap.keySet()) {
-      Replicable requestPayload = this.announcementMap.get(proposalID);
-      if (requestPayload instanceof UserInfoPayload) {
-        if (((UserInfoPayload) requestPayload).isActive()) {
-          userRecord.put(((UserInfoPayload) requestPayload).getEntityID(),
-              (UserInfoPayload) requestPayload);
-          OutputHandler.printWithTimestamp(
-              String.format("User data added for new user with ID: %s at HOST: %s",
-                  ((UserInfoPayload) requestPayload).getEntityID(),
-                  ((UserInfoPayload) requestPayload).getHOST()));
-        } else {
-          userRecord.remove(((UserInfoPayload) requestPayload).getEntityID());
-          OutputHandler.printWithTimestamp(
-              String.format("User data deleted for user with ID: %s at HOST: %s",
-                  ((UserInfoPayload) requestPayload).getEntityID(),
-                  ((UserInfoPayload) requestPayload).getHOST()));
-        }
-
-      }
-      this.announcementMap.remove(proposalID);
-    }
-  }
-}

@@ -3,6 +3,7 @@ package common;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import protocol.PaxMessage;
+import protocol.Replicable;
 
 
 /**
@@ -32,6 +33,10 @@ public interface PaxosServer extends Remote {
    * @param acceptedValue Accepted value
    */
   void announce(PaxMessage acceptedValue) throws RemoteException;
+
+  void put(String entityID, Replicable toReplicate) throws RemoteException;
+
+  void remove(String entityID) throws RemoteException;
 
 //  /**
 //   * Tells the acceptor to connect to the proposer on given port

@@ -57,7 +57,7 @@ public class RMIHandler {
       return obj;
 
     } catch (RemoteException | NotBoundException e) {
-      OutputHandler.printWithTimestamp("ERROR:" +
+      OutputHandler.printWithTimestamp(
           errorMessage + String.format(" HOST: %s PORT: %d", host, PORT));
       return null;
     }
