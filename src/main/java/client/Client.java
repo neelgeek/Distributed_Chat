@@ -4,22 +4,21 @@ import admin.Admin;
 import broker.Broker;
 import client.ThreadingTCP.ClientToThreadInterface;
 import client.ThreadingTCP.PeerHarbor;
-import client.ThreadingTCP.PeerListener;
 import common.OutputHandler;
 import common.PingHeartbeat;
 import common.RMIHandler;
-
 import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
 import protocol.BrokerInfoPayload;
 import protocol.UserInfoPayload;
 
@@ -133,7 +132,6 @@ public class Client implements ClientToBrokerInterface, ClientToThreadInterface 
   public void sendUserUpdateInfo(List userUpdateInfo) throws RemoteException {
 
   }
-  // entid
 
   @Override
   public void startPeerHarbor(int portNo) throws RemoteException {
@@ -144,7 +142,7 @@ public class Client implements ClientToBrokerInterface, ClientToThreadInterface 
 
   private void setListenerPort(int portNo) throws RemoteException {
     selfRecord.setSOCKET_PORT(portNo);
-    brokerStub.setUserPortNumber(selfRecord.getEntityID(), portNo);
+//    brokerStub.setUserPortNumber(selfRecord.getEntityID(), portNo);
   }
 
   public void sendMessageToPeer(String username, String message) throws RemoteException {
