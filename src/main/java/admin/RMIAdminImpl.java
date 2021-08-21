@@ -310,6 +310,7 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, AdminPee
   }
 
   protected void announceCoordinatorToBrokers(AdminInfoPayload leader) {
+
     for (BrokerInfoPayload broker : brokerRecord.values()) {
       Broker brokerStub = RMIHandler.fetchRemoteObject("Broker", broker.getHOST(),
           broker.getPORT());
