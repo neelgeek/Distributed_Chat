@@ -231,7 +231,7 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
   @Override
   public void setUserPortNumber(String entityID, int portNo) throws RemoteException {
     userRecord.get(entityID).setSOCKET_PORT(portNo);
-    adminProposer.submitRequest(userRecord.get(entityID));
+//    adminProposer.submitRequest(userRecord.get(entityID));
   }
 
   @Override
@@ -304,7 +304,7 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
       last_accepted_value = acceptMessage.getProposedValue();
       PaxMessage announceMessage = new PaxMessage(acceptMessage.getProposalID(),
           acceptMessage.getProposedValue(), PaxActions.ACCEPTED);
-      this.announceLearners(announceMessage);
+//      this.announceLearners(announceMessage);
       return announceMessage;
     } else {
       return new PaxMessage(acceptMessage.getProposalID(), PaxActions.NACK, -1, null);
@@ -313,6 +313,7 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
 
   @Override
   public void announce(PaxMessage acceptedValue) throws RemoteException {
+    OutputHandler.printWithTimestamp("Incoming Announcement " + acceptedValue.getProposedValue());
     this.announcementMap.put(acceptedValue.getProposalID(), acceptedValue.getProposedValue());
   }
 
@@ -337,6 +338,7 @@ public class BrokerImpl extends UnicastRemoteObject implements Broker,
       PaxosServer learner = RMIHandler.fetchRemoteObject("Broker", peer.getHOST(), peer.getPORT());
       if (learner != null) {
         try {
+          OutputHandler.printWithTimestamp("Announcing to " + peer);
           learner.announce(announceMessage);
         } catch (RemoteException e) {
           e.printStackTrace();
