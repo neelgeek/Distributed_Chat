@@ -87,7 +87,13 @@ public class PaxosReplication implements Runnable {
           .collect(Collectors.toCollection(ArrayList::new));
 
       if (positiveAccepts.size() >= ACCEPTORS.size() / 2 + 1) {
-//        finalResponse.setSuccess(true);
+        for (PaxosServer peer : ACCEPTORS) {
+          try {
+            peer.announce(acceptMessage);
+          } catch (RemoteException e) {
+            e.printStackTrace();
+          }
+        }
         OutputHandler.printWithTimestamp(
             String.format("Replication successful for ID: %d", current_proposalID));
       } else {

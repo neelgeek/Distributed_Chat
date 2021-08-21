@@ -107,6 +107,12 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, AdminPee
 
   private void startLeaderStatusChecker() {
     if (currentLeader != selfInfo) {
+      if (this.leaderStatusChecker != null) {
+        this.leaderStatusChecker.shutdownNow();
+      }
+      OutputHandler.printWithTimestamp(
+          String.format("Starting Leader Status Checker for leader at HOST: %s PORT: %s",
+              currentLeader.getHOST(), currentLeader.getPORT()));
       this.leaderStatusChecker = Executors.newSingleThreadScheduledExecutor();
       this.leaderStatusChecker.scheduleWithFixedDelay(
           new CheckLeaderStatus(currentLeader.getHOST(), currentLeader.getPORT(), this), 2,
@@ -117,6 +123,7 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, AdminPee
 
   private void startClientStatusChecker() {
     if (currentLeader == selfInfo) {
+      OutputHandler.printWithTimestamp("Starting Client Status Checker!");
       this.brokerStatusChecker.scheduleWithFixedDelay(
           new ClientStatusChecker(brokerTimeouts, this, new Long(2)), 5,
           2,
@@ -264,8 +271,11 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, AdminPee
   }
 
   protected void startElection() {
+    if (RECEIVED_COORDINATOR_ANNOUNCEMENT) {
+      return;
+    }
     this.leaderStatusChecker.shutdownNow(); //Stop check leader thread;
-    //this.IS_ELECTION_STARTED = true;
+    this.IS_ELECTION_STARTED = true;
     //Start election thread;
     try {
       electionThread.submit(new ElectionProcessor(this));
@@ -296,11 +306,10 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, AdminPee
     RECEIVED_COORDINATOR_ANNOUNCEMENT = true;
     currentLeader = leader;
     endElection();
-
+    startClientStatusChecker();
   }
 
   protected void announceCoordinatorToBrokers(AdminInfoPayload leader) {
-    startClientStatusChecker();
     for (BrokerInfoPayload broker : brokerRecord.values()) {
       Broker brokerStub = RMIHandler.fetchRemoteObject("Broker", broker.getHOST(),
           broker.getPORT());
@@ -315,6 +324,7 @@ public class RMIAdminImpl extends UnicastRemoteObject implements Admin, AdminPee
   }
 
   protected void endElection() {
+    OutputHandler.printWithTimestamp("Election Ended");
     startLeaderStatusChecker();
     IS_ELECTION_STARTED = false;
     RECEIVED_COORDINATOR_ANNOUNCEMENT = false;
@@ -416,11 +426,14 @@ class CheckLeaderStatus implements Runnable {
         adminStub.isActive();
       } catch (RemoteException e) {
         OutputHandler.printWithTimestamp(
-            String.format("Admin leader did not respond at HOST: %s", ADMIN_HOST));
+            String.format("Admin leader did not respond at HOST: %s and PORT: %s", ADMIN_HOST,
+                ADMIN_PORT));
         master.startElection();
       }
     }
   }
+
+
 }
 
 class ElectionProcessor extends UnicastRemoteObject implements Runnable, Remote, Serializable {
