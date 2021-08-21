@@ -142,7 +142,7 @@ public class Client implements ClientToBrokerInterface, ClientToThreadInterface 
 
   private void setListenerPort(int portNo) throws RemoteException {
     selfRecord.setSOCKET_PORT(portNo);
-    brokerStub.setUserPortNumber(selfRecord.getEntityID(), portNo);
+//    brokerStub.setUserPortNumber(selfRecord.getEntityID(), portNo);
   }
 
   public void sendMessageToPeer(String username, String message) throws RemoteException {

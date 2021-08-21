@@ -3,6 +3,7 @@ package broker;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import protocol.AdminInfoPayload;
 import protocol.BrokerInfoPayload;
 import protocol.GroupChat;
 import protocol.UserInfoPayload;
@@ -77,6 +78,13 @@ public interface Broker extends Remote {
   boolean leaveGroupChat(UserInfoPayload leavingUser, GroupChat groupChat) throws RemoteException;
 
   void setUserPortNumber(String entityID, int portNo) throws RemoteException;
+
+  /**
+   * Used to Announce new Leader of Admin cluster after the leader has failed
+   *
+   * @param leaderAdmin
+   */
+  void announceNewLeader(AdminInfoPayload leaderAdmin) throws RemoteException;
 
 
 }

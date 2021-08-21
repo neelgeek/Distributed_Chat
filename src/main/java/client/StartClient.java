@@ -25,17 +25,13 @@ public class StartClient {
 
     String successMessage = "Client successfully registered on PORT: " + clientPort;
     Client client = new Client(username, adminHost, adminPORT);
-    client.discoverBroker();
-    client.registerRMI(rmiName, clientPort, successMessage);
 
+    client.registerRMI(rmiName, clientPort, successMessage);
     client.startPeerHarbor(0);
+    client.discoverBroker();
+//    client.registerUser();
+//    client.startSendingHearbeat();
     // client.connectWithAllPeers();
     client.startClient();
-
-    /*List<UserInfoPayload> users = client.getActiveUsers();
-    System.out.println("Active Users:");
-    for (UserInfoPayload uip : users) {
-      System.out.println(uip.getUserName());
-    }*/
   }
 }

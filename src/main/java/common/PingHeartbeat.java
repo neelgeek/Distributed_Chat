@@ -55,4 +55,10 @@ public class PingHeartbeat<I> implements Runnable {
     }
     return null;
   }
+
+  public void updateAdmin(String HOST, Integer PORT) {
+    this.SERVER_HOST = HOST;
+    this.SERVER_PORT = PORT;
+    this.serverStub = getServerStub();
+  }
 }
